@@ -1,0 +1,27 @@
+#define dirPin 2
+#define stepPin 3
+#define motorSpeed 1000
+
+void setup() {
+  pinMode(dirPin, OUTPUT);
+  pinMode(stepPin, OUTPUT);
+  Serial.begin(9600);
+}
+
+void loop() {
+  if (Serial.available() > 0) {
+    int microstepsRequired = Serial.parseInt();
+    while (Serial.available() > 0) Serial.read(); // clear buffer
+
+    if (microstepsRequired != 0) {
+      digitalWrite(dirPin, microstepsRequired > 0 ? HIGH : LOW);
+      for (int i = 0; i < abs(microstepsRequired); i++) {
+        digitalWrite(stepPin, HIGH);
+        delayMicroseconds(1000000 / motorSpeed);
+        digitalWrite(stepPin, LOW);
+        delayMicroseconds(1000000 / motorSpeed);
+      }
+      Serial.println("DONE");  // Send confirmation back
+    }
+  }
+}
